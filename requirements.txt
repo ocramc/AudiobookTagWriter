@@ -1,0 +1,4 @@
+python-magic-bin
+eyed3
+xmltodict
+mutagen
