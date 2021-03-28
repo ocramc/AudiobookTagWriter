@@ -1,4 +1,5 @@
 python-magic-bin
 eyed3
-xmltodict
+pathlib
+untangle
 mutagen
