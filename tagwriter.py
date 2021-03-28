@@ -6,8 +6,6 @@ parser.add_argument("--path", help="set working directory",
 
 args = parser.parse_args()
 
-print(args.suppliedPath)
-
 if args.suppliedPath != None:
     logging.debug("Setting path to " + args.suppliedPath)
     rootDir = args.suppliedPath
@@ -16,16 +14,16 @@ else:
     rootDir = os.getcwd()
 
 if not os.path.exists(rootDir):
-    logging.error("Path " + rootDir + " not found.")
-    sys.exit(1)
+    logging.error("Path " + rootDir + " not found")
+    sys.exit("Path doesn't exist")
 
 if not os.path.isdir(rootDir):
     logging.error("The specified path is not a directory")
-    sys.exit(1)
+    sys.exit("Directory not specified")
 
 if not os.path.exists(os.path.join(rootDir , "metadata.db")):
     logging.error("The specified directory is not a Calibre library")
-    sys.exit(1)
+    sys.exit("Directory not Calibre library")
 
 reply = ""
 while reply != "y":
@@ -34,12 +32,9 @@ while reply != "y":
         logging.debug("User confirmed metadata update")
     elif reply == "n":
         logging.debug("User cancelled metadata update")
-        sys.exit(1)
+        sys.exit("Metadata update cancelled")
     else:
         print("Please specify either (y)es or (n)o to proceed")
-
-
-print("ye")
 
 totalCount = 0
 fileCount = 0
@@ -53,14 +48,16 @@ for dirName, subdirList, fileList in os.walk(rootDir):
         if fileExtension in fileTypes:
             totalCount += 1
 
+logging.debug(totalCount + "files to be updated")
+
 for dirName, subdirList, fileList in os.walk(rootDir):
     for fileName in fileList:
         filePath = os.path.join(dirName , fileName)
         fileExtension = pathlib.Path(filePath).suffix
         if fileExtension in fileTypes:
             fileCount += 1
-            print("Updating file ", str(fileCount), " of ", str(totalCount), " - ", fileName, end="\r")
-            metadataFile = dirName + "\\metadata.opf"
+            print("Updating file " + str(fileCount) + " of " + str(totalCount) + " - " + fileName, end="\r")
+            metadataFile = os.path.join(dirName, "metadata.opf")
             with open(metadataFile, "r", encoding="utf-8") as fd:
                 metadata = untangle.parse(fd.read())
 
