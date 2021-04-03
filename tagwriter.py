@@ -48,7 +48,7 @@ for dirName, subdirList, fileList in os.walk(rootDir):
         if fileExtension in fileTypes:
             totalCount += 1
 
-logging.debug(totalCount + "files to be updated")
+logging.debug(str(totalCount) + " files to be updated")
 
 for dirName, subdirList, fileList in os.walk(rootDir):
     for fileName in fileList:
@@ -56,7 +56,8 @@ for dirName, subdirList, fileList in os.walk(rootDir):
         fileExtension = pathlib.Path(filePath).suffix
         if fileExtension in fileTypes:
             fileCount += 1
-            print("Updating file " + str(fileCount) + " of " + str(totalCount) + " - " + fileName, end="\r")
+            consoleOutput = "Updating file " + str(fileCount) + " of " + str(totalCount) + " - " + fileName
+            print(consoleOutput[:80].ljust(80), end="\r")
             metadataFile = os.path.join(dirName, "metadata.opf")
             with open(metadataFile, "r", encoding="utf-8") as fd:
                 metadata = untangle.parse(fd.read())
