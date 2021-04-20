@@ -1,4 +1,4 @@
-import os, eyed3, pathlib, logging, untangle, mutagen, argparse, sys
+import os, pathlib, logging, untangle, mutagen, argparse, sys
 logging.getLogger().setLevel("ERROR")
 parser = argparse.ArgumentParser()
 parser.add_argument("--path", help="set working directory",
@@ -64,33 +64,22 @@ for dirName, subdirList, fileList in os.walk(rootDir):
 
                 try:
                     bookTitle = metadata.package.metadata.dc_title.cdata
-                    bookAuthor = metadata.package.metadata.dc_creator.cdata
+                    bookAuthor=[]
+                    for Author in metadata.package.metadata.dc_creator:
+                        bookAuthor.append(Author.cdata)
+                    bookAuthor = (" & ".join(bookAuthor))
 
                 except:
                     logging.error("Unable to grab metadata for " + fileName)
                     pass
                 else:
-                    if fileExtension == ".mp3":
-                        try:
-                            audioFile = eyed3.core.load(filePath)
-                            audioFile.initTag()
-                            audioFile.tag.artist = bookAuthor
-                            audioFile.tag.album = bookTitle
-                            audioFile.tag.save()
-                            logging.info("Updated metadata for " + fileName)
-                            pass
+                    try:
+                        audioFile = mutagen.File(filePath, easy=True)
+                        audioFile['artist'] = bookAuthor
+                        audioFile['album'] = bookTitle
+                        audioFile.save(filePath)
+                        logging.info("Updated metadata for " + fileName)
+                        pass
 
-                        except:
-                            logging.error("Unable to update metadata for " + fileName)
-
-                    elif fileExtension == ".m4b":
-                        try:
-                            audioFile = mutagen.File(filePath, easy=True)
-                            audioFile['artist'] = bookAuthor
-                            audioFile['album'] = bookTitle
-                            audioFile.save(filePath)
-                            logging.info("Updated metadata for " + fileName)
-                            pass
-
-                        except:
-                            logging.error("Unable to update metadata for " + fileName)
+                    except:
+                        logging.error("Unable to update metadata for " + fileName)
